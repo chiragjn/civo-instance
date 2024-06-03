@@ -4,5 +4,5 @@ resource "civo_instance" "workspace-instance" {
     notes = "An Example Machine Learning Development Environment"
     size = var.node_size
     disk_image = "ubuntu-cuda12-2" # or ubuntu-cuda11-8
-    # script = file("script.sh")
+    script = file("script.sh")
 }
