@@ -40,7 +40,8 @@ EOF
 # start docker again
 sudo systemctl start docker
 
+# install python 3.11
+sudo apt-get install python3.11 python3.11-dev python3.11-venv -y
+
 # disable automatic updates
 sudo apt remove unattended-upgrades
-
-

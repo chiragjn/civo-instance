@@ -22,17 +22,3 @@ variable "drive_size" {
   type        = number
   default     = 100
 }
-
-# create a variable which manages if we should create a volume or not
-variable "create_volume" {
-  type        = bool
-  default     = true
-  description = "Whether to create a volume or not"
-}
-
-# create a variable which manages if we should create a instance or not
-variable "create_instance" {
-  type        = bool
-  default     = true
-  description = "Whether to create an instance or not"
-}
