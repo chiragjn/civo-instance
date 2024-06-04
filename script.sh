@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 # Ensure the script is run as root
 if [[ $EUID -ne 0 ]]; then
@@ -8,8 +8,9 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+# Install essentials
 sudo apt-get update
-sudo apt-get install -y ca-certificates curl gnupg wget build-essential
+sudo apt-get install -y ca-certificates curl gnupg wget git build-essential software-properties-common
 
 # Add container toolkit repo
 curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
@@ -28,13 +29,31 @@ echo \
   $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
   sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
+# Add nvtop
+sudo add-apt-repository ppa:flexiondotorg/nvtop -y
+
+# Add deadsnakes
+sudo add-apt-repository ppa:deadsnakes/ppa -y
+
+# Fetch packages index
 sudo apt-get update
 
-# Install all the Docker dependencies
-sudo apt-get install -y nvidia-container-toolkit docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
-# Stop Docker
-sudo systemctl stop docker
+# Install all packages
+sudo apt-get install -y --no-install-recommends \
+  htop \
+  nvtop \
+  libcudnn8=8.9.7.29-1+cuda12.2 \
+  libcudnn8-dev=8.9.7.29-1+cuda12.2 \
+  libnccl2 \
+  libnccl-dev nvidia-container-toolkit \
+  docker-ce \
+  docker-ce-cli \
+  containerd.io \
+  docker-buildx-plugin \
+  docker-compose-plugin \
+  python3.11 \
+  python3.11-dev \
+  python3.11-venv
 
 # Modify the Docker daemon config to use the cgroupfs cgroup driver
 sudo mkdir -p /etc/docker
@@ -56,23 +75,28 @@ EOF
 # sudo nvidia-ctk runtime configure --runtime=docker
 
 # Start Docker again
-sudo systemctl start docker
-
-# Install Python 3.11 and its dependencies
-sudo apt-get install -y software-properties-common
-sudo add-apt-repository ppa:deadsnakes/ppa -y
-sudo apt-get update
-sudo apt-get install -y python3.11 python3.11-dev python3.11-venv
+sudo systemctl restart docker
 
 # Disable automatic updates
 sudo apt-get remove -y unattended-upgrades
+
+# Use Docker without root
+sudo groupadd -f docker
+sudo usermod -aG docker civo
 
 # mount the volume
 sudo mkdir -p /data/
 sudo chown -R civo:civo /data/
 sudo mount -o rw /dev/sda1 /data/
+sudo mkdir -p /data/.cache/
+sudo chown -R civo:civo /data/.cache
 
-# Rootless Docker
-sudo groupadd docker
-sudo usermod -aG docker civo
-newgrp docker
+# Set history and caching on external volume
+echo 'export HISTFILE=/data/.civo_bash_history' >> /home/civo/.bashrc
+echo 'export HF_HOME=/data/.cache/huggingface' >> /home/civo/.bashrc
+echo 'export PIP_CACHE_DIR=/data/.cache/pip' >> /home/civo/.bashrc
+
+# Add the volume to /etc/fstab
+echo '/dev/sda1 /data ext4 defaults 0 0' | sudo tee -a /etc/fstab
+
+sudo reboot
