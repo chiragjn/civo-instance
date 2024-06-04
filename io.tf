@@ -22,3 +22,19 @@ variable "drive_size" {
   type        = number
   default     = 100
 }
+
+variable "sshkey_id" {
+  type        = string
+  description = "Uploaded SSH key ID to use for the instance"
+}
+
+variable "persistent_volume_id" {
+  type        = string
+  description = "Created persistent volume to attach to the instance"
+}
+
+variable "reserved_ipv4_id" {
+  type        = string
+  description = "Reserved IP to attach to the instance"
+  
+}

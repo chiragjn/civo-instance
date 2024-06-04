@@ -11,10 +11,13 @@ To deploy simply run:
 - terraform plan
 - terraform apply
 
-Once initally created, you can change the "create_volume" flag to false, and when you recreate this terrafrom repository the data stored in the persisted volume will be remounted to the instance.
+Once initally created, you can change comment out the volume creation, and when you recreate this terrafrom repository the data stored in the persisted volume will be remounted to the instance.
 
 ## Removing the entire deployment
 If you'd like to remove the entire deployment, simply run:
 - terraform destroy
 
 
+TODO:
+
+- [ ] Reserved IP

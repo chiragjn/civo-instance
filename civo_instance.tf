@@ -1,8 +1,12 @@
 # Create a new instance
 resource "civo_instance" "workspace-instance" {
+    notes = "Machine Learning Development Environment"
     hostname = "${var.name_prefix}-instance"
-    notes = "An Example Machine Learning Development Environment"
     size = var.node_size
-    disk_image = "ubuntu-cuda12-2" # or ubuntu-cuda11-8
+    initial_user = "civo"
+    public_ip_required = "none"
+    reserved_ipv4 = "${var.reserved_ipv4_id}"
+    sshkey_id = "${var.sshkey_id}"
+    disk_image = "ubuntu-cuda12-2"
     script = file("script.sh")
 }
