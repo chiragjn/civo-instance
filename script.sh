@@ -12,6 +12,10 @@ fi
 sudo apt-get update
 sudo apt-get install -y ca-certificates curl gnupg wget git build-essential software-properties-common
 
+# Disable GSP
+echo "options nvidia NVreg_EnableGpuFirmware=0" | sudo tee --append /etc/modprobe.d/nvidia.conf
+sudo dpkg-reconfigure nvidia-dkms-535
+
 # Add container toolkit repo
 curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
   && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
