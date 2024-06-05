@@ -121,8 +121,8 @@ sudo chown -R civo:civo /data/.cache
 
 # Set history and caching on external volume
 echo 'export HISTFILE=/data/.civo_bash_history' >> /home/civo/.bashrc
-echo 'export HISTFILE=/data/.civo_bash_history' >> /home/civo/.bashrc
-echo 'export HISTFILE=/data/.civo_bash_history' >> /home/civo/.bashrc
+echo 'export PATH="/usr/local/cuda/bin:${PATH}"' >> /home/civo/.bashrc
+echo 'export LD_LIBRARY_PATH="/usr/local/cuda/lib64:${LD_LIBRARY_PATH}"' >> /home/civo/.bashrc
 echo 'export HF_HOME=/data/.cache/huggingface' >> /home/civo/.bashrc
 echo 'export PIP_CACHE_DIR=/data/.cache/pip' >> /home/civo/.bashrc
 
