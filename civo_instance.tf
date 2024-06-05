@@ -7,6 +7,6 @@ resource "civo_instance" "workspace-instance" {
     public_ip_required = "none"
     reserved_ipv4 = "${var.reserved_ipv4_id}"
     sshkey_id = "${var.sshkey_id}"
-    disk_image = "ubuntu-cuda12-2"
+    disk_image = "ubuntu-jammy"
     script = file("script.sh")
 }

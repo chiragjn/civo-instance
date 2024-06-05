@@ -8,13 +8,36 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
+cd /tmp
+
 # Install essentials
 sudo apt-get update
-sudo apt-get install -y ca-certificates curl gnupg wget git build-essential software-properties-common
+sudo apt-get install -y \
+  gcc \
+  ca-certificates \
+  curl \
+  gnupg \
+  wget \
+  git \
+  build-essential \
+  software-properties-common
 
-# Disable GSP
+# Install drivers with GSP disabled
 echo "options nvidia NVreg_EnableGpuFirmware=0" | sudo tee --append /etc/modprobe.d/nvidia.conf
-sudo dpkg-reconfigure nvidia-dkms-535
+wget https://us.download.nvidia.com/tesla/535.183.01/nvidia-driver-local-repo-ubuntu2204-535.183.01_1.0-1_amd64.deb
+sudo dpkg -i nvidia-driver-local-repo-ubuntu2204-535.183.01_1.0-1_amd64.deb
+sudo cp /var/nvidia-driver-local-repo-ubuntu2204-535.183.01/nvidia-driver-local-76AD990C-keyring.gpg /usr/share/keyrings/
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends cuda-drivers-535
+
+# Install CUDA
+wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
+sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
+wget https://developer.download.nvidia.com/compute/cuda/12.1.1/local_installers/cuda-repo-ubuntu2204-12-1-local_12.1.1-530.30.02-1_amd64.deb
+sudo dpkg -i cuda-repo-ubuntu2204-12-1-local_12.1.1-530.30.02-1_amd64.deb
+sudo cp /var/cuda-repo-ubuntu2204-12-1-local/cuda-*-keyring.gpg /usr/share/keyrings/
+sudo apt-get update
+sudo apt-get -y install cuda-toolkit
 
 # Add container toolkit repo
 curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
@@ -49,7 +72,8 @@ sudo apt-get install -y --no-install-recommends \
   libcudnn8=8.9.7.29-1+cuda12.2 \
   libcudnn8-dev=8.9.7.29-1+cuda12.2 \
   libnccl2 \
-  libnccl-dev nvidia-container-toolkit \
+  libnccl-dev \
+  nvidia-container-toolkit \
   docker-ce \
   docker-ce-cli \
   containerd.io \
@@ -96,6 +120,8 @@ sudo mkdir -p /data/.cache/
 sudo chown -R civo:civo /data/.cache
 
 # Set history and caching on external volume
+echo 'export HISTFILE=/data/.civo_bash_history' >> /home/civo/.bashrc
+echo 'export HISTFILE=/data/.civo_bash_history' >> /home/civo/.bashrc
 echo 'export HISTFILE=/data/.civo_bash_history' >> /home/civo/.bashrc
 echo 'export HF_HOME=/data/.cache/huggingface' >> /home/civo/.bashrc
 echo 'export PIP_CACHE_DIR=/data/.cache/pip' >> /home/civo/.bashrc
