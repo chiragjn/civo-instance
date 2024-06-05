@@ -1,5 +1,4 @@
 #!/bin/bash
-truefoundry:ishaan-test
 set -ex
 
 # Ensure the script is run as root
