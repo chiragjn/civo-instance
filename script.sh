@@ -9,6 +9,9 @@ fi
 
 cd /tmp
 
+# Disable automatic updates
+sudo apt-get remove -y unattended-upgrades
+
 # Install essentials
 sudo apt-get update
 sudo apt-get install -y \
@@ -107,9 +110,6 @@ EOF
 
 # Start Docker again
 sudo systemctl restart docker
-
-# Disable automatic updates
-sudo apt-get remove -y unattended-upgrades
 
 # Use Docker without root
 sudo groupadd -f docker
